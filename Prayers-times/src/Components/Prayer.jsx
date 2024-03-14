@@ -4,12 +4,12 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 
-export default function Prayer({ name , time}) {
+export default function Prayer({ name , time, image}) {
   return (
     <Card sx={{ maxWidth: 345, background: "#272829" }}>
       <CardMedia
         sx={{ height: 140 }}
-        image="src/images/asr-prayer-mosque.png"
+        image={image}
         title="Al Fajr"
       />
       <CardContent>
