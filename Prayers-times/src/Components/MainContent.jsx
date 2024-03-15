@@ -6,12 +6,64 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import moment from "moment";
 export default function MainContent() {
-  const [age, setAge] = useState("");
+  // ? STATES
+  const [timings, setTimings] = useState({
+    Fajr: "",
+    Dhuhr: "",
+    Asr: "",
+    Maghrib: "",
+    Isha: "",
+  });
+  const [selected, setSelected] = useState({
+    displayCity: "RABAT",
+    displayApiCity: "Rabat",
+  });
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  const availableCities = [
+    {
+      displayCity: "RABAT",
+      displayApiCity: "Rabat",
+    },
+    {
+      displayCity: "CASABLANCA",
+      displayApiCity: "Casablanca",
+    },
+    {
+      displayCity: "KHOURIBGA",
+      displayApiCity: "khouribga",
+    },
+    {
+      displayCity: "MEKNES",
+      displayApiCity: "meknes",
+    },
+    {
+      displayCity: "FES",
+      displayApiCity: "fes",
+    },
+  ];
+  // ? END STATES
+
+  const getTime = async () => {
+    const data = await axios.get(
+      `https://api.aladhan.com/v1/timingsByCity?city=${selected.displayApiCity}&country=Morocco`
+    );
+    const time = data.data.data.timings;
+    setTimings(time);
+  };
+
+  useEffect(() => {
+    getTime();
+  }, [selected]);
+
+  const handleChangeCities = (e) => {
+    // const cityObject = availableCities.find((c) => {
+    //   return c.displayApiCity === e.target.value;
+    // });
+    setSelected(e.target.value);
   };
   return (
     <div>
@@ -19,15 +71,8 @@ export default function MainContent() {
       <Grid container>
         <Grid xs={6}>
           <div>
-            <h2>wed 13 match 2024 | 3:40 pm</h2>
-            <h1>KHOURIBGA</h1>
-          </div>
-        </Grid>
-
-        <Grid xs={6}>
-          <div>
-            <h2>Next Prayer at</h2>
-            <h1>Al Asr</h1>
+            <h2>{moment().format("MMMM Do YYYY, h:mm a")}</h2>
+            <h1>{selected.displayCity}</h1>
           </div>
         </Grid>
       </Grid>
@@ -43,28 +88,28 @@ export default function MainContent() {
         style={{ marginTop: "40px" }}
       >
         <Prayer
-          name="Al Fajr"
-          time="04 : 40"
+          name="Fajr"
+          time={timings.Fajr}
           image={"src/images/asr-prayer-mosque.png"}
         />
         <Prayer
-          name="Al Fajr"
-          time="04 : 40"
+          name="Dhuhr"
+          time={timings.Dhuhr}
           image={"src/images/asr-prayer-mosque.png"}
         />
         <Prayer
-          name="Al Fajr"
-          time="04 : 40"
+          name="Asr"
+          time={timings.Asr}
           image={"src/images/asr-prayer-mosque.png"}
         />
         <Prayer
-          name="Al Fajr"
-          time="04 : 40"
+          name="Al Magerib"
+          time={timings.Maghrib}
           image={"src/images/asr-prayer-mosque.png"}
         />
         <Prayer
-          name="Al Fajr"
-          time="04 : 40"
+          name="Isha"
+          time={timings.Isha}
           image={"src/images/asr-prayer-mosque.png"}
         />
       </Stack>
@@ -82,27 +127,23 @@ export default function MainContent() {
         }}
       >
         <FormControl sx={{ m: 4, minWidth: 320 }} size="large">
-          <InputLabel
-            id="demo-select-small-label"
-            style={{ color: "white" }}
-          >
+          <InputLabel id="demo-select-small-label" style={{ color: "white" }}>
             City
           </InputLabel>
           <Select
+            style={{ color: "white" }}
             labelId="demo-select-small-label"
             id="demo-select-small"
-            value={age}
             label="Age"
-            onChange={handleChange}
+            onChange={handleChangeCities}
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={10} >Al Fajr</MenuItem>
-            <MenuItem value={20} >Dohr</MenuItem>
-            <MenuItem value={30} >Al Asr</MenuItem>
-            <MenuItem value={30} >Al Magerib</MenuItem>
-            <MenuItem value={30} >Al Aichaa</MenuItem>
+            {availableCities.map((city) => {
+              return (
+                <MenuItem key={city.displayCity} value={city}>
+                  {city.displayCity}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
       </div>
